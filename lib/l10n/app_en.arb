@@ -1,0 +1,17 @@
+
+{
+  "createAccount": "Create Account",
+  "welcomeBack": "Welcome Back",
+  "signInToContinue":"Sign in to continue",
+  "signIn":"Sign In",
+  "orContinueWith":"or continue with",
+  "google":"Google",
+  "apple":"Apple",
+  "email":"Email",
+  "password":"Password",
+  "forgotPassword":"Forgot Password",
+  "validationEmail": "Invalid email address.",
+   "validationPasswordRequired": "Password is required."
+
+
+}
