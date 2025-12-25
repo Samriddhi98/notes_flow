@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:notes_flow/l10n/app_localizations.dart';
-import 'package:notes_flow/src/features/auth/presentation/sign_in_screen.dart';
+import 'package:notes_flow/src/core/di/injector.dart';
+
+import '../core/router/router.dart';
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+
+  final _appRouter = getIt<AppRouter>();
 
   // This widget is the root of your application.
   @override
@@ -15,7 +19,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       // Use builder only if you need to use library outside ScreenUtilInit context
       builder: (_, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'Notes Flow',
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -25,7 +29,7 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Inter',
             colorScheme: .fromSeed(seedColor: Colors.deepPurple),
           ),
-          home: SignInScreen(),
+          routerConfig: _appRouter.config(),
         );
       },
     );

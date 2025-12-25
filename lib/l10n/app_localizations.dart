@@ -109,7 +109,7 @@ abstract class AppLocalizations {
   /// No description provided for @signInToContinue.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to continue'**
+  /// **'Sign up to get started'**
   String get signInToContinue;
 
   /// No description provided for @signIn.
@@ -118,11 +118,29 @@ abstract class AppLocalizations {
   /// **'Sign In'**
   String get signIn;
 
+  /// No description provided for @signUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
   /// No description provided for @orContinueWith.
   ///
   /// In en, this message translates to:
   /// **'or continue with'**
   String get orContinueWith;
+
+  /// No description provided for @dontHaveAnAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account?'**
+  String get dontHaveAnAccount;
+
+  /// No description provided for @alreadyHaveAnAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAnAccount;
 
   /// No description provided for @google.
   ///
@@ -142,6 +160,12 @@ abstract class AppLocalizations {
   /// **'Email'**
   String get email;
 
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullName;
+
   /// No description provided for @password.
   ///
   /// In en, this message translates to:
@@ -160,11 +184,23 @@ abstract class AppLocalizations {
   /// **'Invalid email address.'**
   String get validationEmail;
 
+  /// No description provided for @validationFullname.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid name'**
+  String get validationFullname;
+
   /// No description provided for @validationPasswordRequired.
   ///
   /// In en, this message translates to:
   /// **'Password is required.'**
   String get validationPasswordRequired;
+
+  /// No description provided for @myNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'My Notes'**
+  String get myNotes;
 }
 
 class _AppLocalizationsDelegate

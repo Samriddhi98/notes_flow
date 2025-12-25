@@ -15,13 +15,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeBack => 'Welcome Back';
 
   @override
-  String get signInToContinue => 'Sign in to continue';
+  String get signInToContinue => 'Sign up to get started';
 
   @override
   String get signIn => 'Sign In';
 
   @override
+  String get signUp => 'Sign Up';
+
+  @override
   String get orContinueWith => 'or continue with';
+
+  @override
+  String get dontHaveAnAccount => 'Don\'t have an account?';
+
+  @override
+  String get alreadyHaveAnAccount => 'Already have an account?';
 
   @override
   String get google => 'Google';
@@ -33,6 +42,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get email => 'Email';
 
   @override
+  String get fullName => 'Full Name';
+
+  @override
   String get password => 'Password';
 
   @override
@@ -42,5 +54,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get validationEmail => 'Invalid email address.';
 
   @override
+  String get validationFullname => 'Invalid name';
+
+  @override
   String get validationPasswordRequired => 'Password is required.';
+
+  @override
+  String get myNotes => 'My Notes';
 }
