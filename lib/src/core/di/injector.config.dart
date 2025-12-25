@@ -26,6 +26,14 @@ import '../../features/auth/domain/repositories/social_login_repository.dart'
     as _i1065;
 import '../../features/auth/domain/usecases/user_signin_usecase.dart' as _i387;
 import '../../features/auth/presentation/bloc/signIn/signin_bloc.dart' as _i384;
+import '../../features/home/data/datasources/notes_remote_datasource.dart'
+    as _i551;
+import '../../features/home/data/repositories/notes_repository_impl.dart'
+    as _i776;
+import '../../features/home/domain/repositories/notes_repository.dart' as _i35;
+import '../../features/home/presentation/bloc/notes_bloc.dart' as _i737;
+import '../../features/home/presentation/bloc/tags_bloc/tags_cubit.dart'
+    as _i113;
 import '../router/router.dart' as _i285;
 import 'injector_modules.dart' as _i287;
 
@@ -37,8 +45,15 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
+    gh.factory<_i737.NotesBloc>(() => _i737.NotesBloc());
+    gh.factory<_i113.TagsCubit>(() => _i113.TagsCubit());
     gh.singleton<_i285.AppRouter>(() => _i285.AppRouter());
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
+    gh.lazySingleton<_i551.NoteRemoteDataSource>(
+      () => _i551.NotesRemoteDataSourceImpl(
+        supabaseClient: gh<_i454.SupabaseClient>(),
+      ),
+    );
     gh.lazySingleton<_i161.AuthRemoteDataSource>(
       () => _i161.AuthRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
     );
@@ -49,6 +64,11 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i787.AuthRepository>(
       () => _i561.AuthRepositoryImpl(gh<_i161.AuthRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i35.NotesRepository>(
+      () => _i776.NotesRepositoryImpl(
+        notesRemoteDataSource: gh<_i551.NoteRemoteDataSource>(),
+      ),
     );
     gh.lazySingleton<_i1065.SocialAuthRepository>(
       () => _i408.SocialAuthRepositoryImpl(
