@@ -24,7 +24,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt.TagsCubit(),
+      create: (context) => getIt<TagsCubit>(),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,

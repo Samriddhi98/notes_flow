@@ -43,3 +43,15 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# FVM Version Cache
+.fvm/
+
+# MCP config — contains plaintext API keys/secrets
+.mcp.json
+
+# envied — .env holds project config; generated file embeds the values
+.env
+.env.*
+!.env.example
+lib/src/core/config/env.g.dart
