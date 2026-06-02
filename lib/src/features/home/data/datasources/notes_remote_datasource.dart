@@ -5,13 +5,12 @@ import '../../../../core/exceptions/exceptions.dart';
 import '../models/notes_model.dart';
 
 abstract class NoteRemoteDataSource {
-  Future<List<NotesModel>> fetchNotes();
-
-  Future<void> addNote(NotesModel note);
-
-  Future<void> updateNote(NotesModel note);
-
+  Future<List<NotesModel>> fetchNotes({String? tagId});
+  Future<NotesModel> addNote(NotesModel note);
+  Future<NotesModel> updateNote(NotesModel note);
   Future<void> deleteNote(String id);
+  Future<void> setPinned({required String id, required bool isPinned});
+  String get currentUserId;
 }
 
 @LazySingleton(as: NoteRemoteDataSource)
@@ -19,78 +18,105 @@ class NotesRemoteDataSourceImpl implements NoteRemoteDataSource {
   NotesRemoteDataSourceImpl({required this.supabaseClient});
 
   final SupabaseClient supabaseClient;
-  final String _tableName = 'notes'; // Your Supabase table name
+  static const _table = 'notes';
 
   @override
-  Future<List<NotesModel>> fetchNotes() async {
-    try {
-      final response = await supabaseClient
-          .from(_tableName)
-          .select()
-          .order('created_at', ascending: false);
+  String get currentUserId {
+    final user = supabaseClient.auth.currentUser;
+    if (user == null) throw ServerException(message: 'Not signed in');
+    return user.id;
+  }
 
-      final notes = (response as List)
-          .map((data) => NotesModel.fromJson(data))
-          .toList();
+  @override
+  Future<List<NotesModel>> fetchNotes({String? tagId}) async {
+    try {
+      final userId = currentUserId;
+      if (tagId == null) {
+        final res = await supabaseClient
+            .from(_table)
+            .select()
+            .eq('user_id', userId)
+            .order('updated_at', ascending: false);
+        return (res as List)
+            .map((e) => NotesModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+      // Filter via the note_tags join. We rely on RLS to scope to this user.
+      final res = await supabaseClient
+          .from('note_tags')
+          .select('note:notes!inner(id, user_id, title, content, is_pinned, created_at, updated_at)')
+          .eq('tag_id', tagId);
+      final notes = <NotesModel>[];
+      final seen = <String>{};
+      for (final row in (res as List)) {
+        final noteJson = row['note'] as Map<String, dynamic>;
+        if (seen.add(noteJson['id'] as String)) {
+          notes.add(NotesModel.fromJson(noteJson));
+        }
+      }
+      notes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       return notes;
     } on PostgrestException catch (e) {
-      // Handle Supabase-specific errors (e.g., network issues, permission errors)
-      throw ServerException(
-        message: 'Failed to fetch notes from Supabase: ${e.message}',
-      );
+      throw ServerException(message: 'Failed to fetch notes: ${e.message}');
     } catch (e) {
-      // Handle any other unexpected errors
-      throw ServerException(
-        message: 'An unexpected error occurred while fetching notes: $e',
-      );
+      throw ServerException(message: 'Unexpected error fetching notes: $e');
     }
   }
 
   @override
-  Future<void> addNote(NotesModel note) async {
+  Future<NotesModel> addNote(NotesModel note) async {
     try {
-      await supabaseClient.from(_tableName).insert(note.toJson());
+      final payload = note.toJson()..['user_id'] = currentUserId;
+      final res = await supabaseClient.from(_table).insert(payload).select().single();
+      return NotesModel.fromJson(res);
     } on PostgrestException catch (e) {
-      throw ServerException(
-        message: 'Failed to add note to Supabase: ${e.message}',
-      );
+      throw ServerException(message: 'Failed to add note: ${e.message}');
     } catch (e) {
-      throw ServerException(
-        message: 'An unexpected error occurred while adding note: $e',
-      );
+      throw ServerException(message: 'Unexpected error adding note: $e');
     }
   }
 
   @override
-  Future<void> updateNote(NotesModel note) async {
+  Future<NotesModel> updateNote(NotesModel note) async {
     try {
-      await supabaseClient
-          .from(_tableName)
-          .update(note.toJson())
-          .eq('id', note.id); // Update the row where the 'id' matches
+      final payload = note.toJson()
+        ..['updated_at'] = DateTime.now().toIso8601String();
+      final res = await supabaseClient
+          .from(_table)
+          .update(payload)
+          .eq('id', note.id)
+          .select()
+          .single();
+      return NotesModel.fromJson(res);
     } on PostgrestException catch (e) {
-      throw ServerException(
-        message: 'Failed to update note in Supabase: ${e.message}',
-      );
+      throw ServerException(message: 'Failed to update note: ${e.message}');
     } catch (e) {
-      throw ServerException(
-        message: 'An unexpected error occurred while updating note: $e',
-      );
+      throw ServerException(message: 'Unexpected error updating note: $e');
     }
   }
 
   @override
   Future<void> deleteNote(String id) async {
     try {
-      await supabaseClient.from(_tableName).delete().eq('id', id);
+      await supabaseClient.from(_table).delete().eq('id', id);
     } on PostgrestException catch (e) {
-      throw ServerException(
-        message: 'Failed to delete note from Supabase: ${e.message}',
-      );
+      throw ServerException(message: 'Failed to delete note: ${e.message}');
     } catch (e) {
-      throw ServerException(
-        message: 'An unexpected error occurred while deleting note: $e',
-      );
+      throw ServerException(message: 'Unexpected error deleting note: $e');
+    }
+  }
+
+  @override
+  Future<void> setPinned({required String id, required bool isPinned}) async {
+    try {
+      await supabaseClient.from(_table).update({
+        'is_pinned': isPinned,
+        'updated_at': DateTime.now().toIso8601String(),
+      }).eq('id', id);
+    } on PostgrestException catch (e) {
+      throw ServerException(message: 'Failed to pin note: ${e.message}');
+    } catch (e) {
+      throw ServerException(message: 'Unexpected error pinning note: $e');
     }
   }
 }

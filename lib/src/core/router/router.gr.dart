@@ -10,6 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:auto_route/auto_route.dart' as _i8;
+import 'package:flutter/material.dart' as _i9;
 import 'package:notes_flow/src/core/common/presentation/empty_pages/home_empty_page.dart'
     as _i1;
 import 'package:notes_flow/src/core/common/presentation/empty_pages/onboard_empty_page.dart'
@@ -42,18 +43,51 @@ class HomeEmptyRoute extends _i8.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.NoteEditorScreen]
-class NoteEditorRoute extends _i8.PageRouteInfo<void> {
-  const NoteEditorRoute({List<_i8.PageRouteInfo>? children})
-    : super(NoteEditorRoute.name, initialChildren: children);
+class NoteEditorRoute extends _i8.PageRouteInfo<NoteEditorRouteArgs> {
+  NoteEditorRoute({
+    _i9.Key? key,
+    String? noteId,
+    List<_i8.PageRouteInfo>? children,
+  }) : super(
+         NoteEditorRoute.name,
+         args: NoteEditorRouteArgs(key: key, noteId: noteId),
+         initialChildren: children,
+       );
 
   static const String name = 'NoteEditorRoute';
 
   static _i8.PageInfo page = _i8.PageInfo(
     name,
     builder: (data) {
-      return const _i2.NoteEditorScreen();
+      final args = data.argsAs<NoteEditorRouteArgs>(
+        orElse: () => const NoteEditorRouteArgs(),
+      );
+      return _i2.NoteEditorScreen(key: args.key, noteId: args.noteId);
     },
   );
+}
+
+class NoteEditorRouteArgs {
+  const NoteEditorRouteArgs({this.key, this.noteId});
+
+  final _i9.Key? key;
+
+  final String? noteId;
+
+  @override
+  String toString() {
+    return 'NoteEditorRouteArgs{key: $key, noteId: $noteId}';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! NoteEditorRouteArgs) return false;
+    return key == other.key && noteId == other.noteId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ noteId.hashCode;
 }
 
 /// generated route for

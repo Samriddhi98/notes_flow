@@ -13,7 +13,6 @@ The Flutter SDK is pinned to **3.41.6 via FVM** (`.fvmrc`). Prefix commands with
 ## Documentation lookups (Context7)
 
 Context7 is configured as an MCP server in `.mcp.json`. Use it to fetch up-to-date docs whenever implementing a new library/framework or adding a feature that uses one (e.g. Supabase Flutter SDK, `auto_route`, `injectable`/`get_it`, `flutter_bloc`, `fpdart`, `flutter_screenutil`) — even for well-known libraries, since training data lags behind releases. Skip it for refactoring existing code, business-logic debugging, code review, and general Dart/Flutter concepts.
-
 ## Commands
 
 ```bash

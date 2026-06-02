@@ -21,7 +21,9 @@ class _SplashScreenState extends State<SplashScreen> {
     if (session != null) {
       context.router.replace(HomeEmptyRoute());
     } else {
-      context.router.replace(OnboardEmptyRoute());
+      context.router.replace(HomeEmptyRoute());
+
+      // context.router.replace(OnboardEmptyRoute());
     }
   }
 
