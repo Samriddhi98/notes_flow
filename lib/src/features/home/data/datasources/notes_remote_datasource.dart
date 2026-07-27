@@ -21,12 +21,24 @@ class NotesRemoteDataSourceImpl implements NoteRemoteDataSource {
   final SupabaseClient supabaseClient;
   final String _tableName = 'notes'; // Your Supabase table name
 
+  /// The signed-in user's id. Notes are scoped to it, and `user_id` is a
+  /// non-null foreign key, so every call needs a session.
+  String get _userId {
+    final userId = supabaseClient.auth.currentUser?.id;
+    if (userId == null) {
+      throw ServerException(message: 'No signed-in user');
+    }
+    return userId;
+  }
+
   @override
   Future<List<NotesModel>> fetchNotes() async {
+    final userId = _userId;
     try {
       final response = await supabaseClient
           .from(_tableName)
           .select()
+          .eq('user_id', userId)
           .order('created_at', ascending: false);
 
       final notes = (response as List)
@@ -48,8 +60,13 @@ class NotesRemoteDataSourceImpl implements NoteRemoteDataSource {
 
   @override
   Future<void> addNote(NotesModel note) async {
+    final userId = _userId;
     try {
-      await supabaseClient.from(_tableName).insert(note.toJson());
+      // The note is built in the presentation layer, which has no access to the
+      // session, so the owner is stamped on here.
+      await supabaseClient
+          .from(_tableName)
+          .insert(note.toJson()..['user_id'] = userId);
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to add note to Supabase: ${e.message}',
@@ -63,11 +80,15 @@ class NotesRemoteDataSourceImpl implements NoteRemoteDataSource {
 
   @override
   Future<void> updateNote(NotesModel note) async {
+    final id = note.id;
+    if (id == null || id.isEmpty) {
+      throw ServerException(message: 'Cannot update a note without an id');
+    }
     try {
       await supabaseClient
           .from(_tableName)
           .update(note.toJson())
-          .eq('id', note.id); // Update the row where the 'id' matches
+          .eq('id', id); // Update the row where the 'id' matches
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to update note in Supabase: ${e.message}',

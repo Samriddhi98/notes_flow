@@ -1,4 +1,4 @@
-import 'package:fpdart/src/either.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:injectable/injectable.dart';
 import 'package:notes_flow/src/core/exceptions/exceptions.dart';
 import 'package:notes_flow/src/core/exceptions/failures.dart';
@@ -17,16 +17,15 @@ class NotesRepositoryImpl implements NotesRepository {
   @override
   Future<Either<Failure, void>> createNote(NotesEntity note) async {
     try {
+      // id, created_at and updated_at are left off so the database generates
+      // them; user_id is stamped on by the datasource from the session.
       final noteModel = NotesModel(
-        id: note.id,
         userId: note.userId,
-        createdAt: note.createdAt,
-        updatedAt: note.updatedAt,
         title: note.title,
         content: note.content,
         isPinned: note.isPinned,
       );
-      final response = await notesRemoteDataSource.addNote(noteModel);
+      await notesRemoteDataSource.addNote(noteModel);
       return Right(null);
     } on ServerException catch (e) {
       return Left(SupabaseFailure(e.message));
@@ -37,7 +36,8 @@ class NotesRepositoryImpl implements NotesRepository {
   Future<Either<Failure, List<NotesEntity>>> getNotes() async {
     try {
       final response = await notesRemoteDataSource.fetchNotes();
-      return Right(response);
+
+      return Right(response.map((model) => model.toEntity()).toList());
     } on ServerException catch (e) {
       return Left(SupabaseFailure(e.message));
     }

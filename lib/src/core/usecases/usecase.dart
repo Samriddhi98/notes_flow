@@ -6,3 +6,8 @@ import '../exceptions/failures.dart';
 abstract interface class UseCase<Type, Params> {
   Future<Either<Failure, Type>> call(Params params);
 }
+
+// Placeholder for use cases that don't need any parameters
+class NoParams {
+  const NoParams();
+}

@@ -31,6 +31,10 @@ import '../../features/home/data/datasources/notes_remote_datasource.dart'
 import '../../features/home/data/repositories/notes_repository_impl.dart'
     as _i776;
 import '../../features/home/domain/repositories/notes_repository.dart' as _i35;
+import '../../features/home/domain/usecases/create_note_usecase.dart' as _i560;
+import '../../features/home/domain/usecases/get_notes_usecase.dart' as _i355;
+import '../../features/home/domain/usecases/modify_note_usecase.dart' as _i216;
+import '../../features/home/domain/usecases/remove_note_usecase.dart' as _i89;
 import '../../features/home/presentation/bloc/notes_bloc.dart' as _i737;
 import '../../features/home/presentation/bloc/tags_bloc/tags_cubit.dart'
     as _i113;
@@ -45,7 +49,6 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
-    gh.factory<_i737.NotesBloc>(() => _i737.NotesBloc());
     gh.factory<_i113.TagsCubit>(() => _i113.TagsCubit());
     gh.singleton<_i285.AppRouter>(() => _i285.AppRouter());
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
@@ -78,10 +81,30 @@ extension GetItInjectableX on _i174.GetIt {
     gh.singleton<_i387.SignInWithEmailUsecase>(
       () => _i387.SignInWithEmailUsecase(gh<_i787.AuthRepository>()),
     );
+    gh.singleton<_i560.CreateNoteUsecase>(
+      () => _i560.CreateNoteUsecase(gh<_i35.NotesRepository>()),
+    );
+    gh.singleton<_i355.GetNotesUsecase>(
+      () => _i355.GetNotesUsecase(gh<_i35.NotesRepository>()),
+    );
+    gh.singleton<_i216.ModifyNoteUsecase>(
+      () => _i216.ModifyNoteUsecase(gh<_i35.NotesRepository>()),
+    );
+    gh.singleton<_i89.RemoveNoteUsecase>(
+      () => _i89.RemoveNoteUsecase(gh<_i35.NotesRepository>()),
+    );
     gh.factory<_i384.SigninBloc>(
       () => _i384.SigninBloc(
         userSignIn: gh<_i387.SignInWithEmailUsecase>(),
         socialAuthRepository: gh<_i1065.SocialAuthRepository>(),
+      ),
+    );
+    gh.factory<_i737.NotesBloc>(
+      () => _i737.NotesBloc(
+        getNotes: gh<_i355.GetNotesUsecase>(),
+        createNote: gh<_i560.CreateNoteUsecase>(),
+        modifyNote: gh<_i216.ModifyNoteUsecase>(),
+        removeNote: gh<_i89.RemoveNoteUsecase>(),
       ),
     );
     return this;

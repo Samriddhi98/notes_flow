@@ -1,57 +1,38 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:notes_flow/src/features/home/domain/entities/notes_entity.dart';
 
-class NotesModel extends NotesEntity {
-  NotesModel({
-    required super.id,
-    required super.userId,
-    required super.createdAt,
-    required super.updatedAt,
-    required super.content,
-    required super.title,
-    required super.isPinned,
-  });
+part 'notes_model.freezed.dart';
+part 'notes_model.g.dart';
 
-  factory NotesModel.fromJson(Map<String, dynamic> map) {
-    return NotesModel(
-      id: map['id'],
-      userId: map['user_id'],
-      title: map['title'],
-      content: map['content'],
-      isPinned: map['is_pinned'] ?? false,
-      createdAt: DateTime.parse(map['created_at']),
-      updatedAt: DateTime.parse(map['updated_at']),
-    );
-  }
+@freezed
+abstract class NotesModel with _$NotesModel {
+  /// [id], [createdAt] and [updatedAt] are nullable and omitted from `toJson()`
+  /// when null: on insert the database fills them in via its `gen_random_uuid()`
+  /// and `now()` defaults. Rows read back from Supabase always carry them.
+  const factory NotesModel({
+    @JsonKey(includeIfNull: false) String? id,
+    @JsonKey(name: 'user_id') required String userId,
+    required String title,
+    required String content,
+    @JsonKey(name: 'is_pinned') @Default(false) bool isPinned,
+    @JsonKey(name: 'created_at', includeIfNull: false) DateTime? createdAt,
+    @JsonKey(name: 'updated_at', includeIfNull: false) DateTime? updatedAt,
+  }) = _NotesModel;
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'title': title,
-      'content': content,
-      'is_pinned': isPinned,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
+  factory NotesModel.fromJson(Map<String, dynamic> json) =>
+      _$NotesModelFromJson(json);
+}
 
-  NotesEntity copyWith({
-    String? id,
-    String? userId,
-    String? title,
-    String? content,
-    bool? isPinned,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) {
-    return NotesEntity(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      title: title ?? this.title,
-      content: content ?? this.content,
-      isPinned: isPinned ?? this.isPinned,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
+extension NotesModelX on NotesModel {
+  /// Only called on rows read back from Supabase, where the nullable
+  /// database-generated fields are always present.
+  NotesEntity toEntity() => NotesEntity(
+        id: id ?? '',
+        userId: userId,
+        title: title,
+        content: content,
+        isPinned: isPinned,
+        createdAt: createdAt ?? DateTime.now(),
+        updatedAt: updatedAt ?? DateTime.now(),
+      );
 }

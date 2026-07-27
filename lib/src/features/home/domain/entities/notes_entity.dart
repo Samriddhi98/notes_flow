@@ -1,8 +1,8 @@
 class NotesEntity {
   final String id;
   final String userId;
-  final String? title;
-  final String? content;
+  final String title;
+  final String content;
   final bool isPinned;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -10,8 +10,8 @@ class NotesEntity {
   NotesEntity({
     required this.id,
     required this.userId,
-    this.title,
-    this.content,
+    required this.title,
+    required this.content,
     this.isPinned = false,
     required this.createdAt,
     required this.updatedAt,

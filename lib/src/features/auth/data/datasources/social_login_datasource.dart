@@ -44,7 +44,7 @@ class SocialLoginDataSourceImpl implements SocialLoginDatasource {
       // Perform the sign in
       final googleAccount = await signIn.authenticate();
       final googleAuthorization = await googleAccount.authorizationClient
-          .authorizationForScopes([]);
+          .authorizationForScopes(['email', 'openid']);
       final googleAuthentication = googleAccount!.authentication;
       final idToken = googleAuthentication.idToken;
       final accessToken = googleAuthorization?.accessToken;
